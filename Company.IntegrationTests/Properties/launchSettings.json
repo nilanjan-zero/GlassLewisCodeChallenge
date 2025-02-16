@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Company.IntegrationTests": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

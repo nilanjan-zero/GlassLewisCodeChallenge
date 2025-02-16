@@ -1,0 +1,50 @@
+@CompanyAPI_HostAddress = http://localhost:5138
+
+### Get all companies
+GET {{CompanyAPI_HostAddress}}/api/companies
+Accept: application/json
+
+###
+
+### Get a company by ID
+GET {{CompanyAPI_HostAddress}}/api/companies/1
+Accept: application/json
+
+###
+
+### Create a new company
+POST {{CompanyAPI_HostAddress}}/api/companies
+Content-Type: application/json
+
+{
+  "name": "New Company",
+  "exchange": "NYSE",
+  "ticker": "NEW",
+  "isin": "US1234567890",
+  "website": "http://www.newcompany.com",
+  "createdOn": "2025-02-15T00:00:00"
+}
+
+###
+
+### Update a company
+PUT {{CompanyAPI_HostAddress}}/api/companies/1
+Content-Type: application/json
+
+{
+  "name": "Updated Company",
+  "exchange": "NASDAQ",
+  "ticker": "UPD",
+  "isin": "US0987654321",
+  "website": "http://www.updatedcompany.com",
+  "createdOn": "2025-02-15T00:00:00",
+  "updateOn": "2025-02-15T12:00:00"
+}
+
+###
+
+### Delete a company
+DELETE {{CompanyAPI_HostAddress}}/api/companies/1
+Accept: application/json
+
+###
