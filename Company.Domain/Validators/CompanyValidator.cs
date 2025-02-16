@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using Company.Domain.Models;
+using Company.Domain.ViewModels;
 
 namespace Company.Domain.Validators
 {
-    public class CompanyValidator : AbstractValidator<Company.Domain.Models.Company>
+    public class CompanyValidator : AbstractValidator<CompanyVM>
     {
         public CompanyValidator()
         {

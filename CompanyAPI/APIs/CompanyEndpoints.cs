@@ -1,5 +1,8 @@
 ﻿using Company.Domain.ViewModels;
 using Company.Services.Interfaces;
+using Company.Domain.Validators;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace CompanyAPI.APIs
 {
@@ -10,7 +13,6 @@ namespace CompanyAPI.APIs
             app.MapGet("/company/id:{id}", async (int id, ICompanyServices companyServices) =>
             {
                 var company = await companyServices.GetCompanyByIdAsync(id);
-
                 return company;
             });
 
@@ -28,16 +30,31 @@ namespace CompanyAPI.APIs
 
             app.MapPost("/add-company", async (CompanyVM companyVM, ICompanyServices companyServices) =>
             {
+                var validator = new CompanyValidator();
+                ValidationResult results = validator.Validate(companyVM);
+
+                if (!results.IsValid)
+                {
+                    return Results.BadRequest(results.Errors);
+                }
+
                 await companyServices.AddCompanyAsync(companyVM);
                 return Results.Ok(companyVM);
             });
 
             app.MapPatch("/update-company/id:{id}", async (int id, CompanyVM companyVM, ICompanyServices companyServices) =>
             {
+                var validator = new CompanyValidator();
+                ValidationResult results = validator.Validate(companyVM);
+
+                if (!results.IsValid)
+                {
+                    return Results.BadRequest(results.Errors);
+                }
+
                 await companyServices.UpdateCompanyAsync(id, companyVM);
                 return Results.Ok(companyVM);
             });
         }
     }
-
 }

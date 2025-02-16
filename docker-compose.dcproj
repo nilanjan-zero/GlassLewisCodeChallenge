@@ -10,9 +10,11 @@
     <DockerServiceName>companyapi</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="docker-compose.integration-tests.yml" />
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>
+    <None Include="docker-compose.unit-tests.yml" />
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
   </ItemGroup>

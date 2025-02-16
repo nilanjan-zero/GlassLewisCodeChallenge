@@ -5,7 +5,6 @@ FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
 USER $APP_UID
 WORKDIR /app
 
-
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -28,4 +27,8 @@ RUN dotnet publish "./Company.UnitTests.csproj" -c $BUILD_CONFIGURATION -o /app/
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Company.UnitTests.dll"]
+
+# Run tests and print results to console
+CMD ["dotnet", "Company.UnitTests.dll", "--logger:console"]
+
+# ENTRYPOINT is not needed for running tests

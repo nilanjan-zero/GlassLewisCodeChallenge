@@ -1,0 +1,2 @@
+docker-compose -f docker-compose.unit-tests.yml up --build
+docker-compose -f docker-compose.integration-tests.yml up --build
