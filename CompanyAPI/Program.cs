@@ -28,17 +28,16 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Apply migrations at startup
-//using (var scope = app.Services.CreateScope())
-//{
-//    var dbContext = scope.ServiceProvider.GetRequiredService<CompanyContext>();
-//    //dbContext.Database.Migrate();
-
-//    // Read and execute SQL script
-//    var sqlScript = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "CompanyDb/Script.PreDeployment.sql"));
-//    dbContext.Database.ExecuteSqlRaw(sqlScript);
-
-//}
+// Apply migrations at startup only if there are pending migrations
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CompanyContext>();
+    var pendingMigrations = dbContext.Database.GetPendingMigrations();
+    if (pendingMigrations.Any())
+    {
+        dbContext.Database.Migrate();
+    }
+}
 
 
 // Configure the HTTP request pipeline.

@@ -4,6 +4,8 @@ using Company.Persistence.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Company.Domain.ViewModels;
 using Company.Domain.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Company.Persistence.Repository
 {
@@ -18,7 +20,12 @@ namespace Company.Persistence.Repository
 
         public async Task<IEnumerable<Company.Domain.Models.Company>> GetAllAsync()
         {
-            return await _context.Company.ToListAsync();
+            var companies = await _context.Company.ToListAsync();
+            if (companies.IsNullOrEmpty())
+            {
+                throw new EntityNotFoundException($"Companies not found.");
+            }
+            return companies;
         }
 
         public async Task<Company.Domain.Models.Company> GetByIdAsync(int id)

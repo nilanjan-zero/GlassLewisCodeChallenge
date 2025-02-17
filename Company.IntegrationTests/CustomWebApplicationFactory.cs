@@ -1,5 +1,4 @@
-﻿using Company.Domain.ViewModels;
-using Company.Persistence;
+﻿using Company.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.SqlClient;
@@ -23,22 +22,32 @@ namespace Company.IntegrationTests
                 var dbContextDescriptor = services.SingleOrDefault(
                     d => d.ServiceType == typeof(DbContextOptions<CompanyContext>));
 
-                services.Remove(dbContextDescriptor);
+                if (dbContextDescriptor != null)
+                {
+                    services.Remove(dbContextDescriptor);
+                }
 
                 var dbConnectionDescriptor = services.SingleOrDefault(
                     d => d.ServiceType == typeof(DbConnection));
 
-                services.Remove(dbConnectionDescriptor);
+                if (dbConnectionDescriptor != null)
+                {
+                    services.Remove(dbConnectionDescriptor);
+                }
 
                 // Create SQL Server connection
                 services.AddSingleton<DbConnection>(container =>
-                {//    "SqlServer": "Server=sqldatabase; Database=CompanyDb; User Id=SA; Password=Easypass123; TrustServerCertificate=True;MultipleActiveResultSets=true"
+                {
+                    var masterConnectionString = "Server=localhost,1433; Initial Catalog=master; User Id=SA; Password=Easypass123; TrustServerCertificate=True;MultipleActiveResultSets=true";
+                    using (var masterConnection = new SqlConnection(masterConnectionString))
+                    {
+                        masterConnection.Open();
+                        CreateDatabase(masterConnection);
+                    }
 
-                    //var connectionString = "Data Source=.;Initial Catalog=CompanyTestDb;Integrated Security=True;Encrypt=True;TrustServerCertificate=True";
-                    var connectionString = "Server=sqldatabase; Database=CompanyTestDb; User Id=SA; Password=Easypass123; TrustServerCertificate=True;MultipleActiveResultSets=true";
-                    _connection = new SqlConnection(connectionString);
+                    var testDbConnectionString = "Server=localhost,1433; Initial Catalog=CompanyTestDb; User Id=SA; Password=Easypass123; TrustServerCertificate=True;MultipleActiveResultSets=true";
+                    _connection = new SqlConnection(testDbConnectionString);
                     _connection.Open();
-
                     return _connection;
                 });
 
@@ -48,14 +57,13 @@ namespace Company.IntegrationTests
                     options.UseSqlServer(connection);
                 });
 
-                // Ensure the database is created and seed test data
+                // Ensure the database is created and apply migrations
                 var sp = services.BuildServiceProvider();
                 using (var scope = sp.CreateScope())
                 {
-                    var db = scope.ServiceProvider.GetRequiredService<CompanyContext>();
-                    //db.Database.EnsureDeleted();
-                    db.Database.EnsureCreated();
-                    SeedTestData(db);
+                    var dbContext = scope.ServiceProvider.GetRequiredService<CompanyContext>();
+                    dbContext.Database.Migrate();
+                    SeedTestData(dbContext);
                 }
             });
 
@@ -67,8 +75,20 @@ namespace Company.IntegrationTests
             // Seed test data
             context.Company.FromSqlRaw("INSERT INTO [dbo].[Company] ([Name]," +
                 "[Exchange],[Ticker],[ISIN],[Website],[CreatedOn],[UpdatedOn]) " +
-                "VALUES ('Company A' ,'NYSE' ,'CA','US123456','abc.com',GETDATE(),GETDATE())");
+                "VALUES ('Company A' ,'NYSE' ,'CA','US1234567890','abc.com',GETDATE(),GETDATE())");
             context.SaveChanges();
+        }
+
+        private void CreateDatabase(DbConnection connection)
+        {
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'CompanyTestDb') " +
+                    "BEGIN " +
+                    "CREATE DATABASE [CompanyTestDb]; " +
+                    "END";
+                command.ExecuteNonQuery();
+            }
         }
 
         public new void Dispose()
@@ -78,7 +98,7 @@ namespace Company.IntegrationTests
             {
                 using (var command = _connection.CreateCommand())
                 {
-                    command.CommandText = "DROP DATABASE [CompanyTestDb]";
+                    command.CommandText = "DROP DATABASE IF EXISTS [CompanyTestDb]";
                     command.ExecuteNonQuery();
                 }
 

@@ -1,4 +1,7 @@
+version: '3.8'
+
 name: company_services
+
 services:
   companyapi:
     image: companyapi
@@ -10,10 +13,27 @@ services:
       - "5000:8081"
     depends_on:
       - sqldatabase
+
   sqldatabase:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqldatabase
     environment:
       SA_PASSWORD: "Easypass123"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
+
+  # db-setup:
+  #   image: mcr.microsoft.com/mssql/server:2022-latest
+  #   container_name: db-setup
+  #   depends_on:
+  #     - sqldatabase
+  #   environment:
+  #     SA_PASSWORD: "Easypass123"
+  #     ACCEPT_EULA: "Y"
+  #   volumes:
+  #     - ${PWD}/CompanyDb:/scripts
+  #   entrypoint: /bin/bash -c "apt-get update && apt-get install -y mssql-tools unixodbc-dev && /bin/bash -c 'sleep 30s && /opt/mssql-tools/bin/sqlcmd -S sqldatabase -U sa -P Easypass123 -i /scripts/Script.PreDeployment.sql'"
+
+volumes:
+  sqlserver-data:

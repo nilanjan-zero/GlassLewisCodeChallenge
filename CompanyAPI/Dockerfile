@@ -15,7 +15,7 @@ COPY ["CompanyAPI/CompanyAPI.csproj", "CompanyAPI/"]
 COPY ["Company.Domain/Company.Domain.csproj", "Company.Domain/"]
 COPY ["Company.Persistence/Company.Persistence.csproj", "Company.Persistence/"]
 COPY ["Company.Services/Company.Services.csproj", "Company.Services/"]
-COPY ["CompanyDb/CompanyDb.sqlproj", "CompanyDb/"]
+
 RUN dotnet restore "./CompanyAPI/CompanyAPI.csproj"
 
 COPY . .
@@ -32,6 +32,5 @@ RUN dotnet publish "./CompanyAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN ls -la
 RUN dotnet --info  # Add this line to verify the presence of the dotnet executable
 ENTRYPOINT ["dotnet", "CompanyAPI.dll"]
