@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Build the Docker image for the application.
-docker build -t mywebapp ./CompanyAPI/
+docker build -t companyapi ./CompanyAPI/
 
 # Start the containers defined in docker-compose.yml.
 docker-compose up -d

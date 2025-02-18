@@ -59,24 +59,31 @@ namespace Company.IntegrationTests
 
                 // Ensure the database is created and apply migrations
                 var sp = services.BuildServiceProvider();
-                using (var scope = sp.CreateScope())
-                {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<CompanyContext>();
-                    dbContext.Database.Migrate();
-                    SeedTestData(dbContext);
-                }
+                using var scope = sp.CreateScope();
+
+                var dbContext = scope.ServiceProvider.GetRequiredService<CompanyContext>();
+                dbContext.Database.Migrate();
+                //SeedTestData(dbContext);
+
             });
 
             builder.UseEnvironment("Development");
         }
 
+        // TODO: fix this method
         private void SeedTestData(CompanyContext context)
         {
-            // Seed test data
-            context.Company.FromSqlRaw("INSERT INTO [dbo].[Company] ([Name]," +
+            // Enable identity insert and seed test data
+            context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Company] ON");
+            context.Company.FromSqlRaw("INSERT INTO [dbo].[Company] ([ID],[Name]," +
                 "[Exchange],[Ticker],[ISIN],[Website],[CreatedOn],[UpdatedOn]) " +
-                "VALUES ('Company A' ,'NYSE' ,'CA','US1234567890','abc.com',GETDATE(),GETDATE())");
+                "VALUES (1, 'Company A', 'NYSE', 'CA', 'US1234567890', 'companya.com', GETDATE(), GETDATE())");
+            context.Company.FromSqlRaw("INSERT INTO [dbo].[Company] ([ID],[Name]," +
+                "[Exchange],[Ticker],[ISIN],[Website],[CreatedOn],[UpdatedOn]) " +
+                "VALUES (2, 'Company B', 'NYSE', 'CB', 'US0987654321', 'companyb.com', GETDATE(), GETDATE())");
+            context.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Company] OFF");
             context.SaveChanges();
+
         }
 
         private void CreateDatabase(DbConnection connection)
@@ -91,13 +98,14 @@ namespace Company.IntegrationTests
             }
         }
 
+        //TODO: fix this method DROP DATABASE.
         public new void Dispose()
         {
-            // Drop the database after tests
             if (_connection != null)
             {
                 using (var command = _connection.CreateCommand())
                 {
+                    // Drop the database
                     command.CommandText = "DROP DATABASE IF EXISTS [CompanyTestDb]";
                     command.ExecuteNonQuery();
                 }

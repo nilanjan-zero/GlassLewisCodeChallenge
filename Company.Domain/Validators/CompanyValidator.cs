@@ -7,6 +7,9 @@ namespace Company.Domain.Validators
     {
         public CompanyValidator()
         {
+            RuleFor(company => company.Name)
+                .NotEmpty().WithMessage("Name is required.");
+
             RuleFor(company => company.ISIN)
                 .NotEmpty().WithMessage("ISIN is required.")
                 .Matches("^[A-Za-z]{2}[A-Za-z0-9]*$").WithMessage("The first two characters of an ISIN must be letters / non numeric");
