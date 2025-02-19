@@ -1,5 +1,3 @@
-version: '3.8'
-
 name: company_services
 
 services:
@@ -35,5 +33,3 @@ services:
   #     - ${PWD}/CompanyDb:/scripts
   #   entrypoint: /bin/bash -c "apt-get update && apt-get install -y mssql-tools unixodbc-dev && /bin/bash -c 'sleep 30s && /opt/mssql-tools/bin/sqlcmd -S sqldatabase -U sa -P Easypass123 -i /scripts/Script.PreDeployment.sql'"
 
-volumes:
-  sqlserver-data:

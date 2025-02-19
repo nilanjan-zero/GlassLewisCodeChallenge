@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+//https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-9.0#test-app-prerequisites
 using System.Data.Common;
 using System.Linq;
 
@@ -38,6 +39,7 @@ namespace Company.IntegrationTests
                 // Create SQL Server connection
                 services.AddSingleton<DbConnection>(container =>
                 {
+                    // TODO: put connection string in appsettings.json
                     var masterConnectionString = "Server=localhost,1433; Initial Catalog=master; User Id=SA; Password=Easypass123; TrustServerCertificate=True;MultipleActiveResultSets=true";
                     using (var masterConnection = new SqlConnection(masterConnectionString))
                     {

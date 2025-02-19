@@ -1,2 +1,7 @@
-docker-compose -f docker-compose.unit-tests.yml up --build
-docker-compose -f docker-compose.integration-tests.yml up --build
+1. to run the app using docker-compose, run the following command:
+	docker-compose up
+2. to run  the unit tests and integration test
+	sh run-tests.sh
+
+Backend: https://localhost:5000/swagger/index.html
+Frontend: http://localhost
